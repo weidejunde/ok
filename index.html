@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tải lên và Hiển thị SVG</title>
-    <link rel="stylesheet" href="styles/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tra chữ Hán Nôm</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Tải lên và Hiển thị SVG</h1>
-    <input type="file" id="fileInput" accept=".svg" multiple>
-    <div id="svgContainer"></div>
-    <script src="scripts/script.js"></script>
+  <div class="container">
+    <div class="search-container">
+      <input type="text" id="search-box" class="search-box" placeholder="Tìm tất cả">
+      <select id="search-type" class="search-type">
+        <option value="all" selected>Tìm tất cả</option>
+        <option value="hanzi">Chữ Hán</option>
+        <option value="pinyin">Âm Hán Việt</option>
+      </select>
+    </div>
+    <div class="result-container">
+      <div id="result" class="result"></div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
 </body>
 </html>
