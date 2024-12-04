@@ -1,0 +1,31 @@
+@font-face {
+    font-family: Arial, Helvetica, sans-serif;
+    src: url(arialbd.ttf);
+    font-weight: bold;
+  }
+@font-face {
+    font-family: Arial, Helvetica, sans-serif;
+    src: url(arialbi.ttf);
+    font-weight: bolder;
+  }
+  @font-face {
+    font-family: Arial, Helvetica, sans-serif;
+    src: url(ariali.ttf);
+    font-weight:lighter;
+  }
+  @font-face {
+    font-family: kaiti;
+    src: url(fonts/simkai.ttf);
+  }
+  @font-face {
+    font-family: Jigmo;
+    src: url(fonts/Jigmo.ttf);
+  }
+  @font-face {
+    font-family: Jigmo2;
+    src: url(fonts/Jigmo2.ttf);
+  }
+  @font-face {
+    font-family: Jigmo3;
+    src: url(fonts/Jigmo3.ttf);
+  }

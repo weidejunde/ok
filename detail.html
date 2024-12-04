@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Chữ</title>
+    <script src="xlsx.full.min.js"></script>
+    <script src="detail.js" defer></script>
+    <style>
+@import "font.css";
+* {
+    font-family: Arial, Jigmo, Jigmo2, Jigmo3;
+}
+        body {
+            font-family: Arial, sans-serif;
+            padding: 1px;
+        }
+
+        h2 {
+            font-family: kaiti, Jigmo, Jgmo2, Jigmo3;
+            font-size: 100px; /* Tăng kích thước chữ */
+            font-weight: normal;
+            margin-bottom: 1px;
+            text-align: center; /* Căn giữa tiêu đề */
+            border: 1px solid red; /* Thêm khung vuông */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px; /* Điều chỉnh khoảng trống bên trong khung */
+            aspect-ratio: 1 / 1; /* Tỉ lệ khung hình là 1:1 để tạo khung vuông */
+            width: 120px; /* Đảm bảo khung vuông nhỏ hơn */
+            height: 120px; /* Đảm bảo khung vuông nhỏ hơn */
+            position: relative; /* Đặt vị trí tương đối để căn giữa chữ */
+        }
+        p {
+            font-size: 18px;
+            align-items: left;
+        }
+    </style>
+</head>
+<body>
+    <div id="detail-container"></div>
+</body>
+</html>

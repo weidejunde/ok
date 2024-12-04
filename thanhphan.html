@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang tìm chữ Vuông</title>
+    <script src="xlsx.full.min.js"></script>
+    <script src="thanhphan.js" defer></script>
+    <link rel="stylesheet" href="thanhphan.css">
+    <style>
+        body {
+            margin: 0; /* Bỏ khoảng cách mặc định của body */
+        }
+        main {
+            margin-top: 0; /* Không cần khoảng cách trên */
+            padding: 10px; /* Thêm một chút padding nếu cần */
+        }
+        .search-container {
+            margin-bottom: 10px; /* Khoảng cách giữa ô tìm kiếm và tab */
+            padding: 0; /* Đưa ô tìm kiếm sát đầu trang */
+        }
+        .tab {
+            display: inline-block; /* Hiển thị tab theo hàng ngang */
+            margin: 0 10px;       /* Khoảng cách giữa các tab */
+            padding: 10px 20px;   /* Khoảng cách bên trong tab */
+            background-color: #fff; /* Màu nền của tab */
+            color: #4CAF50;        /* Màu chữ của tab */
+            border: 1px solid #4CAF50; /* Đường viền của tab */
+            border-radius: 5px;    /* Bo góc cho tab */
+            cursor: pointer;        /* Con trỏ chuột khi di chuột qua tab */
+        }
+        .tab:hover {
+            background-color: #f1f1f1; /* Màu nền khi di chuột qua tab */
+        }
+        .table-container {
+            margin-top: 10px; /* Khoảng cách giữa tìm kiếm và bảng */
+        }
+        aside {
+            margin-top: 10px; /* Khoảng cách giữa bảng và các nút bên dưới */
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <section class="search-container">
+            <input type="text" id="search-input" placeholder="例e.g.: LR日月">
+            <button onclick="search()">→</button>
+            <div id="loading"></div>
+            <div id="special-char-buttons" class="special-char-buttons"></div>
+            <div id="search-results"></div>
+        </section>
+        <section id="detail-container" style="margin-top: 20px;"></section>
+        <aside>
+            <button onclick="exportToExcel()" id="export">Xuất bảng sang Excel</button>
+            <button onclick="toggleTable()" id="toggle-button">Hiện Bảng</button>
+        </aside>
+        <section class="table-container">
+            <table id="data-table" border="1">
+                <thead>
+                    <tr id="header-row"></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+        
+    </main>
+
+</body>
+</html>

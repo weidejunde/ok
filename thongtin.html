@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin từ file Excel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            cursor: pointer; /* Thay đổi con trỏ khi di chuột qua */
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .modal {
+            display: none; /* Ẩn mặc định */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Màu nền tối với độ mờ */
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 0; /* Không có lề */
+            padding: 20px;
+            width: 100%;
+            height: 100%; /* Chiếm toàn bộ chiều cao */
+            overflow-y: auto; /* Cuộn khi nội dung quá lớn */
+            position: relative; /* Để định vị nút đóng */
+        }
+        .close {
+            color: #aaa;
+            position: absolute; /* Định vị nút đóng */
+            top: 20px;
+            right: 30px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: white; /* Đổi màu khi hover */
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Thông tin từ file Excel</h1>
+    <div id="output"></div>
+
+    <!-- Modal để hiển thị thông tin chi tiết -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Chi tiết thông tin</h2>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        let headers = []; // Biến để lưu tiêu đề cột
+
+        // Hàm để đọc dữ liệu từ file Excel
+        function loadExcel() {
+            const url = 'dian.xlsx'; // Đường dẫn đến file Excel
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.arrayBuffer();
+                })
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" }); // defval: "" để giữ ô trống
+
+                    // Lưu tiêu đề cột từ hàng đầu tiên
+                    headers = jsonData[0];
+
+                    // Hiển thị tất cả thông tin từ file Excel
+                    displayAllData(jsonData);
+                })
+                .catch(error => {
+                    console.error('Có lỗi xảy ra:', error);
+                    document.getElementById('output').innerHTML = '<p>Không thể tải dữ liệu từ file Excel.</p>';
+                });
+        }
+
+        // Hàm hiển thị tất cả dữ liệu từ file Excel
+        function displayAllData(data) {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = ''; // Xóa nội dung cũ
+
+            if (data.length === 0) {
+                outputDiv.innerHTML = '<p>Không có dữ liệu nào trong file Excel.</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            const headerRow = document.createElement('tr');
+
+            // Tạo header cho bảng
+            data[0].forEach(col => {
+                const th = document.createElement('th');
+                th.innerText = col;
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            // Tạo các hàng dữ liệu
+            for (let i = 1; i < data.length; i++) {
+                const row = document.createElement('tr');
+                data[i].forEach(col => {
+                    const td = document.createElement('td');
+                    td.innerText = col; // Hiển thị giá trị, bao gồm cả ô trống
+                    row.appendChild(td);
+                });
+                // Thêm sự kiện nhấn vào hàng
+                row.onclick = () => showModal(data[i], table); // Truyền bảng vào hàm
+                table.appendChild(row);
+            }
+
+            outputDiv.appendChild(table);
+        }
+
+        // Hàm hiển thị modal với thông tin chi tiết
+        function showModal(rowData, table) {
+            const modal = document.getElementById("myModal");
+            const modalBody = document.getElementById("modal-body");
+            modalBody.innerHTML = ''; // Xóa nội dung cũ
+
+            // Ẩn bảng khi modal được mở
+            table.style.display = "none";
+
+            // Hiển thị thông tin chi tiết trong modal với tiêu đề cột
+            rowData.forEach((cell, index) => {
+                if (cell) { // Kiểm tra nếu ô không trống
+                    const p = document.createElement('p');
+                    p.innerText = `${headers[index]}: ${cell}`; // Sử dụng tiêu đề cột
+                    modalBody.appendChild(p);
+                }
+            });
+
+            modal.style.display = "block"; // Hiển thị modal
+        }
+
+        // Đóng modal khi nhấn vào nút đóng
+        document.querySelector('.close').onclick = function() {
+            document.getElementById("myModal").style.display = "none";
+            const table = document.querySelector('table'); // Lấy bảng
+            if (table) {
+                table.style.display = "table"; // Hiển thị lại bảng
+            }
+        }
+
+        // Đóng modal khi nhấn ra ngoài modal
+        window.onclick = function(event) {
+            const modal = document.getElementById("myModal");
+            if (event.target === modal) {
+                modal.style.display = "none";
+                const table = document.querySelector('table'); // Lấy bảng
+                if (table) {
+                    table.style.display = "table"; // Hiển thị lại bảng
+                }
+            }
+        }
+
+        // Gọi hàm để tải dữ liệu từ Excel khi trang được tải
+        window.onload = loadExcel;
+    </script>
+</body>
+</html>

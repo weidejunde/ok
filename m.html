@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang m</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            background-color: #0873df;
+            overflow: hidden;
+            padding: 5px;
+        }
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            background-color: #0873df;
+            padding: 5px;
+        }
+        .tab {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 5px 10px;
+            text-decoration: none;
+        }
+        .tab:hover {
+            background-color: #45a049;
+        }
+        .active {
+            background-color: #45a049;
+        }
+        #searchDiv {
+            text-align: center;
+            padding: 5px 0;
+        }
+        #searchInput {
+            padding: 5px;
+            border: none;
+        }
+        #searchButton {
+            padding: 5px 10px;
+            border: none;
+            background-color: #45a049;
+            color: white;
+            cursor: pointer;
+        }
+        #iframe-container {
+            width: 100%;
+            height: calc(100% - 70px); /* Chiều cao trừ đi chiều cao của navbar và tab-container */
+        }
+        iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: none;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div id="searchDiv">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm..." onkeypress="handleKeyPress(event)">
+            <button id="searchButton" onclick="searchContent()">Tìm kiếm</button>
+        </div>
+    </div>
+    
+    <div class="tab-container">
+        <a href="#" class="tab active" id="homeTab" onclick="showHome(this)">Trang chủ</a>
+        <a href="#" class="tab" id="componentsTab" onclick="toggleComponents(this)">Thành phần</a>
+        <a href="#" class="tab" id="randomTab" onclick="showRandom()">Ngẫu nhiên</a>
+    </div>
+
+    <div id="iframe-container">
+        <iframe id="detail-iframe" src="main.html" frameborder="0"></iframe>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script>
+        function showHome(element) {
+            if (element.classList.contains('active')) {
+                return; // Không làm gì nếu tab "Trang chủ" đã được chọn
+            }
+            document.getElementById('detail-iframe').src = 'main.html';
+            setActiveTab(element);
+        }
+
+        function toggleComponents(element) {
+            if (element.classList.contains('active')) {
+                // Nếu tab "Thành phần" đã được chọn, chuyển về tab "Trang chủ"
+                showHome(document.getElementById('homeTab'));
+            } else {
+                // Mở tab "Thành phần"
+                document.getElementById('detail-iframe').src = 'thanhphan.html';
+                setActiveTab(element);
+            }
+        }
+
+        function showRandom() {
+            fetch('dian.xlsx')
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(new Uint8Array(data), {type: 'array'});
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet);
+                    
+                    // Chọn ngẫu nhiên một chữ từ cột đầu tiên
+                    const randomIndex = Math.floor(Math.random() * json.length);
+                    const randomWord = json[randomIndex][Object.keys(json[0])[0]]; // Lấy chữ từ cột đầu tiên
+
+                    document.getElementById('detail-iframe').src = 'detail.html?chu=' + encodeURIComponent(randomWord);
+                    setActiveTab(document.getElementById('randomTab'));
+                })
+                .catch(error => console.error('Error fetching the Excel file:', error));
+        }
+
+        function searchContent() {
+            const input = document.getElementById('searchInput');
+            const query = input.value.trim();
+
+            if (query) {
+                document.getElementById('detail-iframe').src = 'detail.html?chu=' + encodeURIComponent(query);
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                searchContent();
+            }
+        }
+
+        function setActiveTab(element) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>

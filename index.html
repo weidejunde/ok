@@ -1,27 +1,122 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tra chữ Hán Nôm</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang tìm chữ Vuông</title>
+    <script src="xlsx.full.min.js"></script>
+    <script src="thanhphan.js" defer></script>
+    <link rel="stylesheet" href="thanhphan.css">
+    <style>
+        body {
+            margin: 0; /* Bỏ khoảng cách mặc định của body */
+        }
+        main {
+            margin-top: 0; /* Không cần khoảng cách trên */
+            padding: 10px; /* Thêm một chút padding nếu cần */
+        }
+        .navbar {
+            background-color: #4CAF50; /* Màu nền cho thanh điều hướng */
+            overflow: hidden; /* Bỏ các phần tử tràn ra ngoài */
+        }
+        .tab {
+            display: inline-block; /* Hiển thị tab theo hàng ngang */
+            color: white; /* Màu chữ */
+            text-align: center; /* Canh giữa chữ */
+            padding: 14px 16px; /* Padding cho tab */
+            text-decoration: none; /* Bỏ gạch chân */
+        }
+        .tab:hover {
+            background-color: #45a049; /* Màu nền khi di chuột qua tab */
+        }
+        .active {
+            background-color: #45a049; /* Màu nền cho tab đang hoạt động */
+        }
+        .search-container {
+            margin-bottom: 10px; /* Khoảng cách giữa ô tìm kiếm và tab */
+            padding: 0; /* Đưa ô tìm kiếm sát đầu trang */
+        }
+        .table-container {
+            margin-top: 10px; /* Khoảng cách giữa tìm kiếm và bảng */
+        }
+        aside {
+            margin-top: 10px; /* Khoảng cách giữa bảng và các nút bên dưới */
+        }
+        #info-container {
+            margin-top: 20px; /* Khoảng cách giữa bảng và thông tin */
+            border: 1px solid #4CAF50; /* Đường viền cho container thông tin */
+            padding: 10px; /* Padding cho container thông tin */
+        }
+        #detail-iframe {
+            width: 100%; 
+            height: 500px; 
+            border: none; 
+            display: block; /* Đảm bảo iframe hiển thị */
+            margin-top: 20px; /* Khoảng cách giữa các phần tử */
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="search-container">
-      <input type="text" id="search-box" class="search-box" placeholder="Tìm tất cả">
-      <select id="search-type" class="search-type">
-        <option value="all" selected>Tìm tất cả</option>
-        <option value="hanzi">Chữ Hán</option>
-        <option value="pinyin">Âm Hán Việt</option>
-      </select>
-    </div>
-    <div class="result-container">
-      <div id="result" class="result"></div>
-    </div>
-  </div>
 
-  <script type="module" src="script.js"></script>
+    <div class="navbar">
+        <a href="index.html" class="tab">Trang chủ</a>
+        <a href="#" class="tab active" id="info-tab">Thông tin</a> <!-- Tab "Thông tin" được chọn mặc định -->
+        <a href="#" class="tab" id="component-tab">Thành phần</a> <!-- Tab "Thành phần" mới -->
+    </div>
+
+    <main>
+        <section class="search-container">
+            <input type="text" id="search-input" placeholder="例e.g.: LR日月">
+            <button onclick="search()">→</button>
+            <div id="loading"></div>
+            <div id="special-char-buttons" class="special-char-buttons"></div>
+            <div id="search-results"></div>
+        </section>
+        <section class="table-container">
+            <table id="data-table" border="1">
+                <thead>
+                    <tr id="header-row"></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+        <aside>
+            <button onclick="exportToExcel()" id="export">Xuất bảng sang Excel</button>
+            <button onclick="toggleTable()" id="toggle-button">Hiện Bảng</button>
+        </aside>
+        
+        <!-- Iframe để nhúng nội dung từ main.html -->
+        <iframe id="detail-iframe" src="" frameborder="0"></iframe>
+    </main>
+    <footer>
+        <!-- Add footer content here -->
+    </footer>
+
+    <script>
+        // Hàm để tải nội dung từ main.html vào iframe
+        function loadMain() {
+            document.getElementById('detail-iframe').src = 'main.html'; // Thiết lập src của iframe đến main.html
+        }
+
+        // Tải nội dung và nhấn tab "Thông tin" khi trang được tải
+        window.onload = function() {
+            loadMain(); // G ọi hàm để tải nội dung từ main.html vào iframe
+            document.getElementById('info-tab').classList.add('active'); // Đánh dấu tab "Thông tin" là đang hoạt động
+        };
+
+        // Thêm sự kiện click cho tab "Thông tin"
+        document.getElementById('info-tab').addEventListener('click', function() {
+            loadMain(); // Tải lại nội dung từ main.html vào iframe
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active')); // Bỏ đánh dấu cho tất cả các tab
+            this.classList.add('active'); // Đánh dấu tab "Thông tin" là đang hoạt động
+        });
+
+        // Thêm sự kiện click cho tab "Thành phần"
+        document.getElementById('component-tab').addEventListener('click', function() {
+            loadComponent(); // Tải nội dung từ thanhphan.html
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active')); // Bỏ đánh dấu cho tất cả các tab
+            this.classList.add('active'); // Đánh dấu tab "Thành phần" là đang hoạt động
+        });
+    </script>
 </body>
 </html>
